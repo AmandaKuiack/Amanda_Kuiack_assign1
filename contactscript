@@ -1,0 +1,95 @@
+#!/bin/bash
+
+#Check if contacts directory exists
+if [[ ! -e contacts.txt ]]; then
+	#if not create directory file
+	touch contacts.txt
+fi
+
+#Store directory in variable
+file=contacts.txt
+
+
+#parse flags and assign valid arguments to variables
+while getopts ":d:r:ha" opt; do
+	case ${opt} in
+		a ) 
+			#ask for name
+			read -p "Enter contact's name: " namevar
+			#ask for phone number
+			read -p "Enter contact's phone number: " phonevar
+			#ask for address
+			read -p "Enter contact's address: " addressvar
+			#ask email
+			read -p "Enter contact's email: " emailvar
+
+			;;
+		d ) display=${OPTARG}
+			;;
+		r ) remove=${OPTARG}
+			;;
+		h ) 
+			#print help information for contactscript
+			echo 'Use flags [-a] for add contact,'
+			echo "use [-d] then contact's name for display contact,"
+			echo "or use [-r] then contact's name for remove contact."
+			;;
+		: ) 
+			echo "Invalid Option: -${OPTARG} requires an argument" 1>&2
+			;;
+		\? )
+			echo "Invalid Tag. See -h for help." 1>&2
+			;;
+	esac
+done
+
+#If no flags are provided
+if [ $# -lt 1 ]; then
+	echo './contactscript requires flags and/or arguements. See -h for help.' 1>&2
+fi
+
+#append argument to file
+if [[ "$namevar" != "" ]]; then
+	
+	#append contact info to contacts.txt
+	echo "start Name: ${namevar} ; Phonenumber: ${phonevar} ; Address: ${addressvar} ; Email: ${emailvar} ; end" >> $file
+	
+	#notify that contact was added to file
+	echo "Thank you. ${namevar} has been added to contacts."
+fi
+
+#display contact
+if [[ "$display" != "" ]]; then
+	if [[ -s "$file" ]]; then
+		echo "Looking for contact ${display}..."
+	
+		#read file
+		while IFS= read -r line; do
+			if [[ "$line" == *"$display"* ]]; then
+				printf '%s' "$line"|sed -E 's/start *|end *//g'|sed -E 's/; /\n/g'
+			fi
+		done < $file
+	else
+		echo "There are no contacts to display, please add contacts with [-a]." 1>&2
+		exit 1
+	fi
+fi
+
+#remove contact
+if [[ "$remove" != "" ]]; then
+	#read file
+	while IFS= read -r line; do
+
+		#compare line to argument, if match delete line from file
+		if [[ "$line" = *"$remove"* ]]; then
+			sed "/$line/d" $file
+		fi
+	#move output to "temp" file then rename it to overwrite original file
+	done < $file > temp
+	mv temp $file
+
+	#confirm removal
+	printf "$remove was removed from contacts.\n"
+fi
+
+
