@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Amanda Kuiack A01232597 Set-C
+
 #empty variable for if statements
 URL=""
 URLF=""
