@@ -1,0 +1,65 @@
+#!/bin/bash
+
+#empty variable for if statements
+URL=""
+URLF=""
+
+#getops, grabbing arguments and flags from user
+while getopts "f:h" opt; do
+    case ${opt} in
+        f )
+		#Store URL for writing to file
+	    	URLF=${OPTARG}
+        ;;
+
+        h ) 
+	     #explain how to use script
+	     echo "Use just the URL to print links, -f followed by the URL to write links to a file."
+        ;;
+    esac
+done
+
+shift $((OPTIND -1))
+
+#store URL
+URL=$1
+
+if [[ "$URLF" != "" ]];	then
+	#let user know the program is running and may take a while.
+	echo 'Downloadings links please wait...'
+	
+	#crawl the site using spider, no verboseness, grab only the links.
+
+	wget -q $URLF -O wget.log
+	
+	#link to store links
+	touch links.txt
+
+	#read wget.log and pull out just the links themselves and append them to links.txt.
+       	while IFS= read -r line; do 
+			grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*" >> links.txt 
+	#feed in sorted file
+	done < wget.log | sort -u
+
+	#remove wget.log and let the user know the download is complete.
+	rm -f wget.log
+	echo 'Download complete. Links stored in links.txt'
+
+else
+       
+	#let user know the program is running and may take a while.
+	echo 'Downloadings links please wait...'
+
+	#we crawl the site using spider, no verboseness, grab only the links
+	wget -q $URL -O wget.txt  
+	#read wget.log and pull out just the links themselves and print out each one.
+	while IFS= read -r line; do 
+			printf "%s\n" `grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*"` 
+	
+	#feed in sorted file
+	done < wget.txt | sort -u
+
+	#remove wget.log and let the user know the download is complete.
+	rm -f wget.txt wget2.txt
+	echo 'Download complete'
+fi

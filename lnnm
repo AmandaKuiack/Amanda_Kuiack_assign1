@@ -1,0 +1,50 @@
+#!/bin/bash
+
+#empty variable for if statements
+filenamenum=""
+filename=""
+
+#getops, grab variables from flagged arguements 
+while getopts "n:h" opt; do
+	case ${opt} in
+		h ) 
+			#explains how the script works
+			echo 'Just the file name to print normally, flag file name with -n for numbered lines.'
+			;;	
+		n ) 
+			#assigns flagged arguement to variable
+			filenamenum=${OPTARG}
+			;;
+			
+	esac
+done
+
+shift $((OPTIND -1))
+
+#assign arguement to variable
+filename=$1
+
+#if the flagged variable is not empty, print lines with numbers
+if [[ "$filenamenum" != "" ]]; then
+
+	#incrementing count starting at 1
+	count=1
+
+	#Will read the file line by line
+	while IFS= read -r line; do
+  		#prints ex: "1. line" then a new line
+  		printf '%s. %s\n' "$count" "$line"
+  		#increase count
+  		((count++)) 
+	#direct file variable into code
+	done < $filenamenum
+else 
+
+	#Will read the file line by line
+	while IFS= read -r line; do
+  		#prints line as normal
+  		printf '%s\n' "$line"
+  
+	#direct file variable into code
+	done < $filename
+fi
