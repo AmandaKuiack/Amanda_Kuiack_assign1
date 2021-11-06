@@ -40,7 +40,9 @@ if [[ "$filenamenum" != "" ]]; then
   		((count++)) 
 	#direct file variable into code
 	done < $filenamenum
-else 
+fi
+
+if [[ "$filename" != "" ]]; then
 
 	#Will read the file line by line
 	while IFS= read -r line; do

@@ -51,7 +51,10 @@ if [[ "$URLF" != "" ]];	then
 	rm -f wget.txt
 	echo 'Download complete. Links stored in links.txt'
 
-else
+fi
+
+ 
+if [[ "$URL" != "" ]];	then
        
 	#let user know the program is running and may take a while.
 	echo 'Downloadings links please wait...'
